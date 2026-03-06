@@ -7,7 +7,7 @@
 Данный проект создан в рамках выполнения лабораторной работы №1 по
 дисциплине **Интеллектуальные информационные системы**.
 
-Цель работы --- подготовить структуру проекта, настроить рабочее
+Цель работы - подготовить структуру проекта, настроить рабочее
 окружение и провести **разведочный анализ данных (EDA)**.
 
 В ходе выполнения лабораторной работы была создана структура проекта,
@@ -19,22 +19,36 @@
 
 ------------------------------------------------------------------------
 
-# Структура проекта
+## Структура проекта
 
 На текущем этапе структура проекта имеет следующий вид:
 
-my_proj │ ├── .venv_my_proj \# виртуальное окружение ├── .git \#
-локальный git репозиторий │ ├── data \# данные проекта │ ├── dataset.csv
-\# исходный датасет │ └── clean_dataset.pkl \# очищенный датасет │ ├──
-eda \# результаты разведочного анализа │ ├── eda.ipynb │ ├──
-graph1_price_range_distribution.png │ ├── graph2_ram_distribution.png │
-├── graph3_ram_vs_price_range.png │ ├── graph4_correlation_matrix.png │
-├── graph5_battery_ram_scatter.png │ └──
-graph6_interactive_ram_battery.html │ ├── .gitignore ├── README.md └──
-requirements.txt
+```
+my_proj
+│
+├── .venv_my_proj            # виртуальное окружение
+├── .git                     # локальный git репозиторий
+│
+├── data                     # данные проекта (не коммитятся)
+│   ├── dataset.csv          # исходный датасет
+│   └── clean_dataset.pkl    # очищенный датасет
+│
+├── eda                      # результаты разведочного анализа
+│   ├── eda.ipynb
+│   ├── graph1_price_range_distribution.png
+│   ├── graph2_ram_distribution.png
+│   ├── graph3_ram_vs_price_range.png
+│   ├── graph4_correlation_matrix.png
+│   ├── graph5_battery_ram_scatter.png
+│   └── graph6_interactive_ram_battery.html
+│
+├── .gitignore
+├── README.md
+└── requirements.txt
+```
 
-Важно: файлы данных (.csv, .pkl) не должны попадать в репозиторий и
-игнорируются через .gitignore.
+
+
 
 ------------------------------------------------------------------------
 
@@ -46,21 +60,16 @@ requirements.txt
 
 git clone https://github.com/AnoshkinDV/iis.git
 
-## 2. Создать виртуальное окружение
+## 2. Создать и активировать виртуальное окружение
 
-python3 -m venv .venv_my_proj
+python3 -m venv venv
+source venv/bin/activate
 
-## 3. Активировать виртуальное окружение
-
-Linux / Ubuntu:
-
-source .venv_my_proj/bin/activate
-
-## 4. Установить зависимости
+## 3. Установить зависимости
 
 pip install -r requirements.txt
 
-## 5. Добавить датасет
+## 4. Добавить датасет
 
 Скопировать файл dataset.csv в папку:
 
