@@ -41,7 +41,6 @@ my_proj
 │   ├── graph4_correlation_matrix.png
 │   ├── graph5_battery_ram_scatter.png
 │   └── graph6_interactive_ram_battery.html
-│
 ├── .gitignore
 ├── README.md
 └── requirements.txt
@@ -176,4 +175,113 @@ eda/
 Полученные результаты будут использоваться в следующих лабораторных
 работах.
 
+------------------------------------------------------------------------
 
+# Лабораторная работа №2  
+## Настройка и исследование моделей машинного обучения
+
+---
+
+## Цель работы
+
+Основная цель лабораторной работы №2 — провести исследования по настройке и подбору параметров моделей машинного обучения для улучшения качества предсказаний на подготовленном датасете.
+
+---
+
+## Задачи работы
+
+- Изучить методы предварительной настройки и отбора гиперпараметров моделей.
+- Провести настройку различных моделей с использованием выбранных критериев.
+- Произвести отбор признаков по важности.
+- Провести оценку качества моделей по метрикам.
+- Сравнить результаты различных настроек и подобрать лучшую конфигурацию.
+
+---
+
+## Описание процесса
+
+В рамках лабораторной работы был реализован полный цикл исследования моделей машинного обучения.
+
+Основные этапы работы:
+
+- Использован подготовленный и очищенный датасет мобильных устройств.
+- Построена **baseline модель RandomForestClassifier**.
+- Выполнен **feature engineering** с использованием инструментов `sklearn`.
+- Проведён **отбор признаков с помощью SequentialFeatureSelector из библиотеки mlxtend**.
+- Выполнен **подбор гиперпараметров модели RandomForestClassifier с использованием Optuna**.
+- Все эксперименты, параметры моделей, метрики и артефакты были сохранены и проанализированы в **MLflow**.
+
+---
+
+## Результаты исследования
+
+В ходе экспериментов были протестированы следующие конфигурации моделей:
+
+1. Baseline RandomForestClassifier
+2. RandomForest + Feature Engineering
+3. RandomForest + Feature Engineering + Feature Selection (mlxtend SequentialFeatureSelector)
+4. RandomForest + Optuna Hyperparameter Tuning
+
+По результатам экспериментов лучшую метрику качества показала модель: sklearn_feature_engineering + mlxtend_forward_selection_random_forest
+
+
+| Метрика | Значение |
+|-------|-------|
+| F1 weighted | ≈ 0.91 |
+| Precision weighted | ≈ 0.91 |
+| Recall weighted | ≈ 0.91 |
+| ROC AUC OVR weighted | ≈ 0.99 |
+
+## Используемая модель
+
+RandomForestClassifier
+
+## Параметры модели
+
+n_estimators = 100
+random_state = 42
+n_jobs = -1
+
+## Отобранные признаки
+
+Финальная модель обучалась на признаках, полученных после этапа **feature engineering** и последующего **feature selection**.
+
+Список признаков сохранён в файлах:
+
+research/artifacts/selected_feature_names.txt
+research/artifacts/production_feature_names.txt
+
+Примеры выбранных признаков: ram
+battery_power
+px_height
+px_width
+int_memory
+ram battery_power
+battery_power^2
+px_height_1.0
+px_height_2.0
+px_width_1.0
+px_width_2.0
+int_memory_1.0
+int_memory_2.0
+
+## Production модель
+
+Финальная production модель обучена **на всей выборке данных** и зарегистрирована в **MLflow Model Registry**.
+
+Название модели: mobile_price_classifier
+
+Версия модели: Version 7
+
+## Run ID production модели
+
+Run ID прогона production модели: 8a53557b6bb24b9681270b3a8a2f70bc
+
+## Для запуска mlflow выполнить
+
+mlflow server `
+    --backend-store-uri sqlite:///mlruns.db `
+    --default-artifact-root ./mlartifacts `
+    --host localhost `
+    --port 5000
+После запуска откроыть в браузере http://localhost:5000 для просмотра результатов.

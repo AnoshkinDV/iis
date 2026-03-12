@@ -1,0 +1,6 @@
+{
+    "precision_weighted": 0.8745304333623694,
+    "recall_weighted": 0.874,
+    "f1_weighted": 0.8742047302311854,
+    "roc_auc_ovr_weighted": 0.9775813333333334
+}
