@@ -279,9 +279,11 @@ Run ID прогона production модели: 8a53557b6bb24b9681270b3a8a2f70bc
 
 ## Для запуска mlflow выполнить
 
+```
 mlflow server `
     --backend-store-uri sqlite:///mlruns.db `
     --default-artifact-root ./mlartifacts `
     --host localhost `
     --port 5000
 После запуска откроыть в браузере http://localhost:5000 для просмотра результатов.
+```
