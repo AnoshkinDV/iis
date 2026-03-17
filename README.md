@@ -335,6 +335,8 @@ services/
 ├── models/
 │   ├── get_model.py         # загрузка модели из MLflow
 │   └── model.pkl            # обученная модель
+```
+
 ---
 
 ## Описание файлов
@@ -458,12 +460,12 @@ POST /api/prediction?item_id=...
 Перейти в директорию: services/ml_service
 
 Выполнить команду:
-```bash
+```
 docker build -t mobile_price_service:1 .
 ```
 
-mobile_price_service — имя образа
-1 — версия образа
+mobile_price_service — имя образа, 1 — версия образа
+
 ---
 
 ## Запуск контейнера
@@ -475,8 +477,8 @@ docker run -p 8000:8000 -v $(pwd)/../models:/models mobile_price_service:1
 Параметры:
 
 -p 8000:8000 — проброс порта контейнера на хост
-
 -v $(pwd)/../models:/models — подключение модели внутрь контейнера
+
 ---
 
 ## Проверка работоспособности
