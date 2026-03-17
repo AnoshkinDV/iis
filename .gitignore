@@ -5,3 +5,5 @@ __pycache__/
 .ipynb_checkpoints/
 ml*
 !mlflow/start_mlflow.sh
+!services/ml_services
+.codexignore
