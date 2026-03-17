@@ -319,7 +319,7 @@ mlflow server `
 
 ---
 
-## Структура сервиса
+## Структура сервиса и описание файлов
 
 Папка `services` содержит две основные директории:
 
@@ -336,123 +336,15 @@ services/
 │   ├── get_model.py         # загрузка модели из MLflow
 │   └── model.pkl            # обученная модель
 ```
+Папка services/ml_service содержит код REST‑сервиса для инференса модели:
 
----
+ - main.py – FastAPI‑приложение с endpointом /api/prediction/{item_id}, описанием входных полей и формированием pandas.DataFrame для модели.
+ - api_handler.py – обёртка над загруженной моделью (joblib.load), выполняющая предсказание по переданным признакам.
+ - requirements.txt – минимальные зависимости, необходимые только для работы сервиса (FastAPI, Uvicorn, pandas, numpy, scikit‑learn, pickle4).
+ - Dockerfile – рецепт сборки Docker‑образа на базе python:3.11-slim и команды для запуска Uvicorn внутри контейнера.
 
-## Описание файлов
-
-### `services/ml_service/main.py`
-
-- Основной файл FastAPI-приложения  
-- Реализует endpoint: POST /api/prediction?item_id=...
-
-- Принимает признаки объекта в теле запроса  
-- Возвращает предсказание модели  
-
----
-
-### `services/ml_service/api_handler.py`
-
-- Загружает модель из файла `/models/model.pkl`  
-- Преобразует входные признаки в формат, ожидаемый моделью  
-- Формирует `pandas.DataFrame`  
-- Выполняет предсказание с помощью `model.predict()`  
-
----
-
-### `services/ml_service/requirements.txt`
-
-Содержит зависимости, необходимые только для работы сервиса:
-
-- fastapi  
-- uvicorn  
-- pandas  
-- scikit-learn  
-- pickle4  
-
----
-
-### `services/ml_service/Dockerfile`
-
-- Базовый образ: `python:3.11-slim`  
-- Копирует код сервиса внутрь контейнера  
-- Устанавливает зависимости  
-- Открывает порт `8000`  
-- Запускает FastAPI через Uvicorn  
-
----
-
-### `services/models/get_model.py`
-
-- Подключается к MLflow  
-- Загружает production-модель по `run_id`  
-- Сохраняет модель в файл `model.pkl`  
-
----
-
-### `services/models/model.pkl`
-
-- Сериализованная модель `RandomForestClassifier`  
-- Используется сервисом для выполнения предсказаний  
-
----
-
-### `services/ml_service/main.py`
-
-- Основной файл FastAPI-приложения  
-- Реализует endpoint:
-
-POST /api/prediction?item_id=...
-
-- Принимает признаки объекта в теле запроса  
-- Возвращает предсказание модели  
-
----
-
-### `services/ml_service/api_handler.py`
-
-- Загружает модель из файла `/models/model.pkl`  
-- Преобразует входные признаки в формат, ожидаемый моделью  
-- Формирует `pandas.DataFrame`  
-- Выполняет предсказание с помощью `model.predict()`  
-
----
-
-### `services/ml_service/requirements.txt`
-
-Содержит зависимости, необходимые только для работы сервиса:
-
-- fastapi  
-- uvicorn  
-- pandas  
-- scikit-learn  
-- pickle4  
-
----
-
-### `services/ml_service/Dockerfile`
-
-- Базовый образ: `python:3.11-slim`  
-- Копирует код сервиса внутрь контейнера  
-- Устанавливает зависимости  
-- Открывает порт `8000`  
-- Запускает FastAPI через Uvicorn  
-
----
-
-### `services/models/get_model.py`
-
-- Подключается к MLflow  
-- Загружает production-модель по `run_id`  
-- Сохраняет модель в файл `model.pkl`  
-
----
-
-### `services/models/model.pkl`
-
-- Сериализованная модель `RandomForestClassifier`  
-- Используется сервисом для выполнения предсказаний  
-
+Папка models содержит файл обученной модели:
+model.pkl – обученная модель, который используется сервисом для предсказаний.
 ---
 
 ## Сборка Docker-образа
