@@ -41,6 +41,15 @@ my_proj
 │   ├── graph4_correlation_matrix.png
 │   ├── graph5_battery_ram_scatter.png
 │   └── graph6_interactive_ram_battery.html
+├── ml_service/
+│   ├── main.py              # FastAPI приложение
+│   ├── api_handler.py       # обработчик запросов и работа с моделью
+│   ├── Dockerfile           # сборка docker-образа
+│   ├── requirements.txt     # зависимости сервиса
+│
+├── models/
+│   ├── get_model.py         # загрузка модели из MLflow
+│   └── model.pkl            # обученная модель
 ├── .gitignore
 ├── README.md
 └── requirements.txt
