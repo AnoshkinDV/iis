@@ -3,3 +3,4 @@ uvicorn==0.30.6
 pandas==2.2.2
 scikit-learn==1.5.2
 pickle4==0.0.1
+prometheus-client==0.21.0

@@ -1,0 +1,29 @@
+services:
+  ml_service:
+    build:
+      context: ./ml_services
+    container_name: ml_service
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./models:/models
+    restart: unless-stopped
+
+  requests:
+    build:
+      context: ./requests
+    container_name: requests
+    depends_on:
+      - ml_service
+    restart: unless-stopped
+
+  prometheus:
+    image: prom/prometheus
+    container_name: prometheus
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+    depends_on:
+      - ml_service
+    restart: unless-stopped

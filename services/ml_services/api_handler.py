@@ -53,9 +53,9 @@ class FastAPIHandler:
     ]
 
         df = pd.DataFrame([model_features])[feature_order]
-        print(self.model.feature_names_in_)
-        print("INPUT FEATURES:")
-        print(df)
+        # print(self.model.feature_names_in_)
+        # print("INPUT FEATURES:")
+        # print(df)
         prediction = self.model.predict(df)[0]
 
         return float(prediction)
