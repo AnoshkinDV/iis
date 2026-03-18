@@ -1,7 +1,7 @@
 from fastapi import FastAPI, Request
 from pydantic import BaseModel
 from api_handler import FastAPIHandler
-from fastapi.responses import Response
+from fastapi.responses import Response, JSONResponse
 from prometheus_client import Counter, Histogram, generate_latest, CONTENT_TYPE_LATEST
 
 app = FastAPI()
@@ -46,7 +46,9 @@ PREDICTION_HISTOGRAM = Histogram(
     buckets=(0, 1, 2, 3, 4, 5)
 )
 
-
+@app.get("/test_500")
+def test_500():
+    raise Exception("Test 500 error")
 
 @app.get("/")
 def read_root():
@@ -71,11 +73,19 @@ def predict(item_id: int, features: PhoneFeatures):
 
 @app.middleware("http")
 async def track_errors(request: Request, call_next):
-    response = await call_next(request)
+    try:
+        response = await call_next(request)
 
-    if 400 <= response.status_code < 500:
-        ERROR_COUNT.labels(status_code="4xx").inc()
-    elif 500 <= response.status_code < 600:
+        if 400 <= response.status_code < 500:
+            ERROR_COUNT.labels(status_code="4xx").inc()
+        elif 500 <= response.status_code < 600:
+            ERROR_COUNT.labels(status_code="5xx").inc()
+
+        return response
+
+    except Exception as e:
         ERROR_COUNT.labels(status_code="5xx").inc()
-
-    return response
+        return JSONResponse(
+            status_code=500,
+            content={"detail": f"Internal server error: {str(e)}"}
+        )

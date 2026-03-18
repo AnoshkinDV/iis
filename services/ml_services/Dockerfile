@@ -1,10 +1,12 @@
 FROM python:3.11-slim
 
-COPY . /ml_service
-
 WORKDIR /ml_service
 
-RUN pip install --no-cache-dir --default-timeout=120 --retries=5 -r requirements.txt
+COPY requirements.txt .
+COPY wheels /wheels
+RUN pip install --no-cache-dir --no-index --find-links=/wheels -r requirements.txt
+
+COPY . .
 
 VOLUME ["/models"]
 

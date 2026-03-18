@@ -7,3 +7,6 @@ ml*
 !mlflow/start_mlflow.sh
 !services/ml_services
 .codexignore
+services/ml_services/wheels/
+services/grafana/*
+!services/grafana/grafana.db
