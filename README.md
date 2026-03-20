@@ -26,30 +26,21 @@
 ```
 my_proj
 │
-├── .venv_my_proj            # виртуальное окружение
-├── .git                     # локальный git репозиторий
-│
-├── data                     # данные проекта (не коммитятся)
-│   ├── dataset.csv          # исходный датасет
-│   └── clean_dataset.pkl    # очищенный датасет
-│
-├── eda                      # результаты разведочного анализа
-│   ├── eda.ipynb
-│   ├── graph1_price_range_distribution.png
-│   ├── graph2_ram_distribution.png
-│   ├── graph3_ram_vs_price_range.png
-│   ├── graph4_correlation_matrix.png
-│   ├── graph5_battery_ram_scatter.png
-│   └── graph6_interactive_ram_battery.html
-├── ml_service/
-│   ├── main.py              # FastAPI приложение
-│   ├── api_handler.py       # обработчик запросов и работа с моделью
-│   ├── Dockerfile           # сборка docker-образа
-│   ├── requirements.txt     # зависимости сервиса
-│
-├── models/
-│   ├── get_model.py         # загрузка модели из MLflow
-│   └── model.pkl            # обученная модель
+├── data/                      # данные (dataset.csv, clean_dataset.pkl)
+├── eda/                       # EDA ноутбук и графики
+├── research/                  # исследования и артефакты MLflow
+│   ├── research.ipynb
+│   ├── production_pipeline.ipynb
+│   ├── artifacts/
+│   └── run.ps1
+├── services/
+│   ├── ml_services/           # FastAPI сервис предсказаний
+│   ├── models/                # get_model.py (загрузка из MLflow)
+│   ├── requests/              # генератор запросов
+│   ├── prometheus/            # prometheus.yml
+│   └── grafana/               # данные grafana
+├── models/                    # model.pkl (production)
+├── services/compose.yml
 ├── .gitignore
 ├── README.md
 └── requirements.txt
@@ -284,7 +275,7 @@ int_memory_2.0
 
 ## Run ID production модели
 
-Run ID прогона production модели: 8a53557b6bb24b9681270b3a8a2f70bc
+Run ID прогона production модели: 8165633fb74d422da075b341cd030f41
 
 ## Для запуска mlflow выполнить
 
@@ -317,7 +308,7 @@ mlflow server `
 ```
 services/
 │
-├── ml_service/
+├── ml_services/
 │   ├── main.py              # FastAPI приложение
 │   ├── api_handler.py       # обработчик запросов и работа с моделью
 │   ├── Dockerfile           # сборка docker-образа
@@ -331,7 +322,7 @@ services/
 
  - main.py – FastAPI‑приложение с endpointом /api/prediction/{item_id}, описанием входных полей и формированием pandas.DataFrame для модели.
  - api_handler.py – загружает модель из `/models/model.pkl`, преобразует входные данные и выполняет предсказание
- - requirements.txt – минимальные зависимости, необходимые только для работы сервиса (FastAPI, Uvicorn, pandas, numpy, scikit‑learn, pickle4).
+ - requirements.txt – минимальные зависимости, необходимые только для работы сервиса (FastAPI, Uvicorn, pandas, numpy, scikit‑learn, cloudpickle).
  - Dockerfile – рецепт сборки Docker‑образа на базе python:3.11-slim и команды для запуска Uvicorn внутри контейнера.
 
 Папка models содержит файл обученной модели:
@@ -341,7 +332,7 @@ model.pkl – обученная модель, который используе
 
 ## Сборка Docker-образа
 
-Перейти в директорию: services/ml_service
+Перейти в директорию: services/ml_services
 
 Выполнить команду:
 ```
@@ -374,27 +365,31 @@ http://localhost:8000/docs
 ```
 ## Пример запроса:
 ```
-POST /api/rediction?item_id=1
+POST /api/prediction?item_id=1
 ```
 ## Пример тела запроса:
 ```
 {
+  "battery_power": 1500,
+  "blue": 1,
+  "clock_speed": 2.0,
+  "dual_sim": 1,
+  "fc": 8,
+  "four_g": 1,
+  "int_memory": 32,
+  "m_dep": 0.6,
+  "mobile_wt": 140,
   "n_cores": 4,
-  "sc_h": 12,
+  "pc": 12,
+  "px_height": 1200,
+  "px_width": 1000,
+  "ram": 2048,
+  "sc_h": 15,
+  "sc_w": 8,
+  "talk_time": 12,
+  "three_g": 1,
   "touch_screen": 1,
-  "ram_2": 4000000,
-  "ram_battery_power": 3000000,
-  "battery_power_2": 2250000,
-  "px_height_0_0": 0,
-  "px_height_1_0": 1,
-  "px_height_2_0": 0,
-  "px_height_3_0": 0,
-  "px_width_0_0": 0,
-  "px_width_1_0": 1,
-  "px_width_3_0": 0,
-  "int_memory_0_0": 0,
-  "int_memory_1_0": 1,
-  "int_memory_3_0": 0
+  "wifi": 1
 }
 ```
 
@@ -402,7 +397,7 @@ POST /api/rediction?item_id=1
 ```
 {
   "item_id": 1,
-  "predict": 3
+  "predict": 2
 }
 
 ```

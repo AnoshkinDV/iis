@@ -7,26 +7,26 @@ ML_SERVICE_URL = "http://ml_service:8000/api/prediction"
 
 def generate_features():
     return {
+        "battery_power": random.uniform(500.0, 2000.0),
+        "blue": random.choice([0.0, 1.0]),
+        "clock_speed": random.uniform(0.5, 3.0),
+        "dual_sim": random.choice([0.0, 1.0]),
+        "fc": random.uniform(0.0, 20.0),
+        "four_g": random.choice([0.0, 1.0]),
+        "int_memory": random.uniform(2.0, 64.0),
+        "m_dep": random.uniform(0.1, 1.0),
+        "mobile_wt": random.uniform(80.0, 200.0),
         "n_cores": random.choice([1.0, 2.0, 4.0, 6.0, 8.0]),
+        "pc": random.uniform(0.0, 20.0),
+        "px_height": random.uniform(0.0, 2000.0),
+        "px_width": random.uniform(0.0, 2000.0),
+        "ram": random.uniform(256.0, 4000.0),
         "sc_h": random.uniform(5.0, 20.0),
+        "sc_w": random.uniform(5.0, 20.0),
+        "talk_time": random.uniform(2.0, 20.0),
+        "three_g": random.choice([0.0, 1.0]),
         "touch_screen": random.choice([0.0, 1.0]),
-
-        "ram_2": random.uniform(1000000.0, 25000000.0),
-        "ram_battery_power": random.uniform(500000.0, 10000000.0),
-        "battery_power_2": random.uniform(250000.0, 4000000.0),
-
-        "px_height_0_0": random.choice([0.0, 1.0]),
-        "px_height_1_0": random.choice([0.0, 1.0]),
-        "px_height_2_0": random.choice([0.0, 1.0]),
-        "px_height_3_0": random.choice([0.0, 1.0]),
-
-        "px_width_0_0": random.choice([0.0, 1.0]),
-        "px_width_1_0": random.choice([0.0, 1.0]),
-        "px_width_3_0": random.choice([0.0, 1.0]),
-
-        "int_memory_0_0": random.choice([0.0, 1.0]),
-        "int_memory_1_0": random.choice([0.0, 1.0]),
-        "int_memory_3_0": random.choice([0.0, 1.0]),
+        "wifi": random.choice([0.0, 1.0]),
     }
 
 
