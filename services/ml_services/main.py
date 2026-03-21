@@ -46,10 +46,6 @@ PREDICTION_HISTOGRAM = Histogram(
     buckets=(0, 1, 2, 3, 4, 5)
 )
 
-@app.get("/test_500")
-def test_500():
-    raise Exception("Test 500 error")
-
 @app.get("/")
 def read_root():
     return {"Hello": "World"}
