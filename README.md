@@ -1,3 +1,19 @@
+# Описание проекта
+
+End‑to‑end ML‑проект по классификации ценовой категории смартфонов.  
+Включает полный цикл: EDA → обучение и эксперименты в MLflow → выбор production‑модели → деплой FastAPI‑сервиса → мониторинг метрик в Prometheus и визуализация в Grafana.
+
+**Что сделано:**
+- подготовка и анализ данных (EDA),
+- построение baseline‑модели и улучшение через feature engineering и feature selection,
+- подбор гиперпараметров (Optuna),
+- логирование экспериментов и регистрация модели в MLflow,
+- production‑модель и REST‑сервис предсказаний,
+- мониторинг запросов/ошибок/предсказаний и инфраструктурных метрик.
+
+**Стек:**  
+Python, pandas, scikit‑learn, FastAPI, MLflow, Prometheus, Grafana, Docker, Docker Compose.
+
 # Лабораторная работа №1
 
 ## Настройка окружения и разведочный анализ данных (EDA)
@@ -25,25 +41,55 @@
 
 ```
 my_proj
-│
-├── data/                      # данные (dataset.csv, clean_dataset.pkl)
-├── eda/                       # EDA ноутбук и графики
-├── research/                  # исследования и артефакты MLflow
-│   ├── research.ipynb
-│   ├── production_pipeline.ipynb
-│   ├── artifacts/
-│   └── run.ps1
-├── services/
-│   ├── ml_services/           # FastAPI сервис предсказаний
-│   ├── models/                # get_model.py (загрузка из MLflow)
-│   ├── requests/              # генератор запросов
-│   ├── prometheus/            # prometheus.yml
-│   └── grafana/               # данные grafana
-├── models/                    # model.pkl (production)
-├── services/compose.yml
-├── .gitignore
-├── README.md
-└── requirements.txt
+|_____ .venv_my_proj           # виртуальное окружение
+|_____ .git                    # локальный репозиторий
+|_____ data                    # исходные и промежуточные данные
+| |___ dataset.csv             # исходный датасет
+| |___ clean_dataset.pkl       # очищенный датасет
+|
+|_____ eda                     # EDA
+| |___ eda.ipynb               # разведочный анализ данных
+|
+|_____ images                  # скриншоты графиков и дашборда
+| |___ Частота запросов в минуту.png
+| |___ Количество запросов с ошибками 4xx и 5xx.png
+| |___ Гистограмма предсказаний модели по bucket-интервалам.png
+| |___ ml_dashboard.png
+|
+|_____ research                # исследования и MLflow
+| |___ research.ipynb          # эксперименты по моделям
+| |___ production_pipeline.ipynb  # финальный production pipeline
+| |___ artifacts/              # списки признаков и артефакты
+| |___ run.ps1                 # запуск MLflow
+|
+|__ services                   # продакшн-часть: сервисы и мониторинг
+|  |__ ml_services             # сервис инференса (FastAPI)
+|  |  |__ main.py              # точка входа FastAPI
+|  |  |__ api_handler.py       # обработка данных и predict
+|  |  |__ requirements.txt     # зависимости сервиса
+|  |  |__ Dockerfile           # сборка образа ml_service
+|  |
+|  |__ requests                # генератор запросов к ml_service
+|  |  |__ requests_sender.py   # скрипт отправки запросов
+|  |  |__ requirements.txt     # зависимости генератора трафика
+|  |  |__ Dockerfile           # сборка образа requests_service
+|  |
+|  |__ prometheus              # конфигурация Prometheus
+|  |  |__ prometheus.yml       # jobs/targets (ml_service)
+|  |
+|  |__ grafana                 # файлы Grafana
+|  |  |__ grafana.db           # база Grafana
+|  |  |__ ml_dashboard.json    # экспортированный дашборд
+|  |  |__ ...                  # служебные папки (csv, pdf, plugins, png)
+|  |
+|  |__ models                  # модель и скрипт загрузки
+|  |  |__ get_model.py         # скрипт получения модели из MLflow
+|  |  |__ model.pkl            # сериализованная production‑модель
+|
+|_____ services/compose.yml    # Docker Compose для всех сервисов
+|_____ .gitignore
+|_____ README.md
+|_____ requirements.txt
 ```
 
 
@@ -303,30 +349,32 @@ mlflow server `
 
 ## Структура сервиса и описание файлов
 
-Папка `services` содержит две основные директории:
+Папка `services` содержит ключевые директории сервиса:
 
 ```
 services/
 │
 ├── ml_services/
-│   ├── main.py              # FastAPI приложение
-│   ├── api_handler.py       # обработчик запросов и работа с моделью
-│   ├── Dockerfile           # сборка docker-образа
-│   ├── requirements.txt     # зависимости сервиса
+│ ├── main.py # FastAPI приложение
+│ ├── api_handler.py # обработчик запросов и работа с моделью
+│ ├── Dockerfile # сборка docker-образа
+│ ├── requirements.txt # зависимости сервиса
 │
 ├── models/
-│   ├── get_model.py         # загрузка модели из MLflow
-│   └── model.pkl            # обученная модель
+│ ├── get_model.py # загрузка модели из MLflow
+│ └── model.pkl # обученная production‑модель
+
 ```
-Папка services/ml_service содержит код REST‑сервиса для инференса модели:
+Папка `services/ml_services` содержит код REST‑сервиса для инференса модели:
 
- - main.py – FastAPI‑приложение с endpointом /api/prediction/{item_id}, описанием входных полей и формированием pandas.DataFrame для модели.
- - api_handler.py – загружает модель из `/models/model.pkl`, преобразует входные данные и выполняет предсказание
- - requirements.txt – минимальные зависимости, необходимые только для работы сервиса (FastAPI, Uvicorn, pandas, numpy, scikit‑learn, cloudpickle).
- - Dockerfile – рецепт сборки Docker‑образа на базе python:3.11-slim и команды для запуска Uvicorn внутри контейнера.
+- `main.py` — FastAPI‑приложение с endpoint `/api/prediction`, описание входных полей, формирование данных для модели.  
+- `api_handler.py` — загрузка модели из `services/models/model.pkl`, подготовка входных данных и предсказание.  
+- `requirements.txt` — зависимости, необходимые для работы сервиса.  
+- `Dockerfile` — сборка Docker‑образа и запуск Uvicorn.
 
-Папка models содержит файл обученной модели:
-model.pkl – обученная модель, который используется сервисом для предсказаний.
+Папка `services/models` содержит:
+- `get_model.py` — скрипт загрузки модели из MLflow
+- `model.pkl` — сериализованная production‑модель для сервиса
 
 ---
 
@@ -336,10 +384,10 @@ model.pkl – обученная модель, который используе
 
 Выполнить команду:
 ```
-docker build -t mobile_price_service:1 .
+docker build -t mobile_price_service:2 .
 ```
 
-mobile_price_service — имя образа, 1 — версия образа
+mobile_price_service — имя образа, 2 — версия образа
 
 ---
 
@@ -347,7 +395,7 @@ mobile_price_service — имя образа, 1 — версия образа
 Из той же директории выполнить:
 
 ```
-docker run -p 8000:8000 -v $(pwd)/../models:/models mobile_price_service:1
+docker run -p 8000:8000 -v $(pwd)/../models:/models mobile_price_service:2
 ```
 Параметры:
 
@@ -402,3 +450,83 @@ POST /api/prediction?item_id=1
 
 ```
 ---
+
+# Лабораторная работа №4. Мониторинг сервиса предсказаний
+
+В рамках ЛР4 добавлен стек мониторинга Prometheus + Grafana для сервиса предсказаний.  
+Цель — собирать метрики работы сервиса и модели, визуализировать их на дашборде и анализировать поведение системы под нагрузкой.
+
+## Используемые технологии
+- Prometheus + prometheus_client — сбор и экспозиция метрик
+- Grafana — визуализация метрик и дашборд
+- Docker, Docker Compose — совместный запуск сервисов
+
+## Сервисы мониторинга (services/)
+- `prometheus/` — конфигурация Prometheus  
+  Файл: `services/prometheus/prometheus.yml`  
+  Веб‑интерфейс: http://localhost:9090
+- `grafana/` — дашборды Grafana  
+  Файл: `services/grafana/ml_dashboard.json`  
+  Веб‑интерфейс: http://localhost:3000 (admin / admin)
+- `requests/` — генератор трафика для ML‑сервиса (фоновые запросы для метрик)  
+
+Сервисы БД и pgadmin в этой лабораторной работе не использовались, задания по БД не выполнялись (по условию допустимо).
+
+## Запуск проекта (Docker Compose)
+
+Из корня проекта:
+```bash
+docker compose -f services/compose.yml up --build -d
+```
+
+Остановка:
+```bash
+docker compose -f services/compose.yml down
+```
+Доступные сервисы:
+- ML‑сервис: http://localhost:8000/docs
+- Prometheus: http://localhost:9090
+- Grafana: http://localhost:3000 (admin / admin)
+
+---
+
+
+## Метрики и мониторинг
+
+Метрики сервиса доступны по `/metrics` и собираются Prometheus.
+
+Примеры запросов:
+- Частота запросов (RPS):  
+  `sum(rate(prediction_requests_total[1m])) * 60`
+- Ошибки 4xx / 5xx:  
+  `sum(rate(prediction_errors_total{status_code="4xx"}[1m])) * 60`  
+  `sum(rate(prediction_errors_total{status_code="5xx"}[1m])) * 60`
+- Гистограмма предсказаний:  
+  `sum(rate(prediction_value_histogram_bucket[1m])) by (le)`
+
+### Скриншоты Prometheus
+**Гистограмма предсказаний модели:**  
+![](images/Гистограмма%20предсказаний%20модели%20по%20bucket-интервалам.png)
+
+**Частота запросов в минуту:**  
+![](images/Частота%20запросов%20в%20минуту.png)
+
+**Ошибки 4xx и 5xx:**  
+![](images/Количество%20запросов%20с%20ошибками%204xx%20и%205xx.png)
+
+## Дашборд Grafana
+Дашборд экспортирован в `services/grafana/ml_dashboard.json`.  
+Содержит 5 панелей разных уровней мониторинга:
+
+- `App | RPS (Requests per Minute)`
+- `App | Errors 4xx/5xx per Minute`
+- `Model | Prediction Distribution (Histogram)`
+- `Infra | CPU Usage`
+- `Infra | RAM Usage`
+
+**Скриншот дашборда:**  
+![](images/ml_dashboard.png)
+
+### Импорт/экспорт
+Экспорт: Grafana → Dashboard settings → JSON model → Download JSON  
+Импорт: Grafana → Dashboards → Import → Upload JSON file → `ml_dashboard.json`
